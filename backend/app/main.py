@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .leads import router as leads_router
 from .media import router as media_router
 from .vehicles import router as vehicles_router
 
@@ -20,6 +21,7 @@ app.add_middleware(
 
 app.include_router(vehicles_router)
 app.include_router(media_router)
+app.include_router(leads_router)
 
 
 @app.get("/health")
