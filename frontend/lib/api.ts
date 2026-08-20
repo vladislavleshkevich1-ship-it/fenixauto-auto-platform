@@ -26,3 +26,9 @@ export async function getVehicle(id: number): Promise<Vehicle> {
   if (!response.ok) throw new Error("Unable to load vehicle");
   return response.json();
 }
+
+export async function getVehicleBySlug(slug: string): Promise<Vehicle> {
+  const response = await fetch(`${API_URL}/api/v1/vehicles/by-slug/${encodeURIComponent(slug)}`, { cache: "no-store" });
+  if (!response.ok) throw new Error("Unable to load vehicle");
+  return response.json();
+}
