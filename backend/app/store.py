@@ -5,11 +5,7 @@ from .domain import Vehicle, VehicleCreate
 class VehicleStore:
     @staticmethod
     def _from_row(row) -> Vehicle:
-        return Vehicle(
-            id=row[0], slug=row[1], brand=row[2], model=row[3], trim=row[4],
-            year=row[5], mileage_km=row[6], price_usd=float(row[7]),
-            status=row[8], source=row[9], description=row[10], is_visible=row[11],
-        )
+        return Vehicle(**row)
 
     def list(self) -> list[Vehicle]:
         with get_connection() as connection:
@@ -43,6 +39,7 @@ class VehicleStore:
                  payload.mileage_km, payload.price_usd, payload.status.value,
                  payload.source.value, payload.description),
             ).fetchone()
+            connection.commit()
         return self._from_row(row)
 
 
