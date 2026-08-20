@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { getVehicleBySlug } from "../../../lib/api";
+import { getVehicleBySlug, getVehicleMedia } from "../../../lib/api";
 import LeadForm from "./LeadForm";
+import VehicleGallery from "./VehicleGallery";
 
 export const dynamic = "force-dynamic";
 
@@ -15,9 +16,14 @@ function statusLabel(status: string) {
 export default async function VehiclePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   let car;
-  try { car = await getVehicleBySlug(slug); } catch { notFound(); }
+  try {
+    car = await getVehicleBySlug(slug);
+  } catch {
+    notFound();
+  }
   if (!car) notFound();
 
+  const media = await getVehicleMedia(car.id).catch(() => []);
   const mileage = `${car.mileage_km.toLocaleString("ru-RU")} км`;
   const price = `$${car.price_usd.toLocaleString("en-US")}`;
 
@@ -32,7 +38,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ slug: 
       </section>
 
       <section className="vehicle-top">
-        <div className="vehicle-gallery"><div className="gallery-main"><div className="gallery-placeholder"><span>FENIX_AUTO</span><strong>{car.brand} {car.model}</strong><small>Фотографии будут доступны после загрузки</small></div></div><div className="gallery-thumbs"><div className="gallery-thumb active"><span>Фото 1</span><small>Основное</small></div><div className="gallery-thumb"><span>Фото 2</span><small>—</small></div><div className="gallery-thumb"><span>Фото 3</span><small>—</small></div></div></div>
+        <VehicleGallery media={media} title={`${car.brand} ${car.model}${car.trim ? ` ${car.trim}` : ""}`} />
         <aside className="vehicle-summary"><div className="summary-title">Об автомобиле</div><div className="summary-grid"><div><small>Год</small><strong>{car.year}</strong></div><div><small>Пробег</small><strong>{mileage}</strong></div><div><small>Марка</small><strong>{car.brand}</strong></div><div><small>Модель</small><strong>{car.model}</strong></div><div><small>Комплектация</small><strong>{car.trim ?? "—"}</strong></div><div><small>Источник</small><strong>{car.source}</strong></div></div><div className="summary-note"><span>✓</span><p>Автомобиль опубликован в каталоге Fenix_Auto.</p></div><a className="primary-button" href="#request">Получить предложение</a></aside>
       </section>
 
