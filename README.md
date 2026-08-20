@@ -1,38 +1,77 @@
 # Fenix Auto Platform
 
-Платформа Fenix_Auto для каталога автомобилей, автомобилей в наличии и будущей интеграции с внешними источниками/API (AuctionsAPI, Copart, IAAI, Encar и др.).
+Собственная автомобильная платформа Fenix_Auto для каталога, автомобилей в наличии, автомобилей под заказ, заявок и будущих интеграций с внешними источниками.
+
+## Стек
+
+- Frontend: Next.js + TypeScript
+- Backend: FastAPI + Python
+- Database: PostgreSQL
+- Cache/background jobs: Redis
+- Containerization: Docker Compose
+- CI: GitHub Actions
 
 ## Архитектура
 
-Проект планируется как собственная автомобильная платформа:
+Fenix_Auto является системой хранения и отображения данных. Внешние источники подключаются через адаптеры и не управляют структурой публичного сайта.
 
-- Frontend: Next.js + TypeScript
-- Backend API: FastAPI / Python
-- Database: PostgreSQL
-- Cache/background jobs: Redis
-- Media: S3-compatible storage
-- Admin: управление автомобилями, контентом, ценами и статусами
+```text
+Source Adapter
+   ↓
+Fenix Auto API
+   ↓
+PostgreSQL
+   ↓
+Admin / Catalog / Vehicle Page
+```
 
-## Основной принцип
+Источники могут быть ручными, USA, Korea, China и другими. Внешний источник хранит свои идентификаторы и исходные данные отдельно от коммерческих данных Fenix_Auto.
 
-Внешние API являются источниками данных. Автомобили сохраняются в собственной базе Fenix_Auto, поэтому карточки, цены, статусы и контент Fenix_Auto не зависят напрямую от внешнего API.
+## Уже реализовано
 
-## Этапы
+- Vehicle model, statuses and sources
+- PostgreSQL schema for vehicles, specs, sources, media, prices and leads
+- FastAPI vehicle CRUD API
+- Media API with primary-photo support
+- Lead API stored in PostgreSQL
+- Next.js catalog
+- Dynamic vehicle pages by slug
+- Real media rendering in vehicle gallery
+- Admin vehicle creation/edit/archive
+- Admin leads inbox
+- Docker Compose for PostgreSQL, Redis, backend and frontend
+- CI workflow for backend database/import checks and frontend production build
 
-1. Базовая структура проекта и доменная модель автомобиля.
-2. Админ-панель и ручное добавление автомобилей.
-3. Публичный каталог и карточка автомобиля.
-4. Калькулятор стоимости под ключ.
-5. Интеграция AuctionsAPI.
-6. CRM/Telegram и дополнительные источники.
+## Локальный запуск
 
-## Статусы автомобилей
+Требуется Docker и Docker Compose.
 
-- IN_STOCK — В наличии
-- RESERVED — Забронирован
-- IN_TRANSIT — В пути
-- ORDER — Под заказ
-- AUCTION — На аукционе
-- BUY_NOW — Buy Now
-- SOLD — Продан
-- ARCHIVED — Архив
+```bash
+docker compose up --build
+```
+
+После запуска:
+
+- Frontend: http://localhost:3000
+- Catalog: http://localhost:3000/cars
+- Admin: http://localhost:3000/admin
+- Leads: http://localhost:3000/admin/leads
+- API: http://localhost:8000
+- API docs: http://localhost:8000/docs
+- Health: http://localhost:8000/health
+
+Первый тестовый автомобиль загружается через `database/seed.sql`.
+
+## Важное правило данных
+
+Поля Fenix_Auto (цена, описание, статус, видимость, контент) не должны перезаписываться синхронизацией внешнего источника. Для внешних интеграций используются отдельные source-данные и адаптеры.
+
+## Следующие этапы
+
+1. Production deployment
+2. Authentication and roles for admin
+3. Object storage / полноценная загрузка фотографий
+4. Расширенные характеристики и SEO/CMS
+5. USA source adapter
+6. Korea source adapter
+7. Дополнительные источники, CRM и Telegram
