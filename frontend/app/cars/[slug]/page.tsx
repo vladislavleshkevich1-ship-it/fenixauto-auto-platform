@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { getVehicleBySlug } from "../../../lib/api";
 import LeadForm from "./LeadForm";
 
+export const dynamic = "force-dynamic";
+
 function statusLabel(status: string) {
   const labels: Record<string, string> = {
     IN_STOCK: "В наличии", RESERVED: "Забронирован", IN_TRANSIT: "В пути", ORDER: "Под заказ",
