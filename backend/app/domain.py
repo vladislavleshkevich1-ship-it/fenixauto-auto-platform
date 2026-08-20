@@ -36,6 +36,19 @@ class VehicleCreate(BaseModel):
     description: str | None = None
 
 
+class VehicleUpdate(BaseModel):
+    brand: str | None = Field(default=None, min_length=1, max_length=100)
+    model: str | None = Field(default=None, min_length=1, max_length=100)
+    trim: str | None = Field(default=None, max_length=150)
+    year: int | None = Field(default=None, ge=1900, le=2100)
+    mileage_km: int | None = Field(default=None, ge=0)
+    price_usd: float | None = Field(default=None, ge=0)
+    status: VehicleStatus | None = None
+    source: VehicleSource | None = None
+    description: str | None = None
+    is_visible: bool | None = None
+
+
 class Vehicle(VehicleCreate):
     id: int
     slug: str
