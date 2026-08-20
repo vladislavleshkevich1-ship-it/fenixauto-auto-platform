@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from "react";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
 const initialForm = {
   brand: "Deepal",
   model: "S07",
@@ -16,6 +18,7 @@ const initialForm = {
 export default function AdminPage() {
   const [form, setForm] = useState(initialForm);
   const [message, setMessage] = useState("");
+  const [createdUrl, setCreatedUrl] = useState("");
 
   function update(key: string, value: string) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -24,22 +27,17 @@ export default function AdminPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("Сохраняем...");
-
+    setCreatedUrl("");
     try {
-      const response = await fetch("http://localhost:8000/api/v1/vehicles", {
+      const response = await fetch(`${API_URL}/api/v1/vehicles`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          year: Number(form.year),
-          mileage_km: Number(form.mileage_km),
-          price_usd: Number(form.price_usd),
-        }),
+        body: JSON.stringify({ ...form, year: Number(form.year), mileage_km: Number(form.mileage_km), price_usd: Number(form.price_usd), source: "FENIX_AUTO" }),
       });
-
       if (!response.ok) throw new Error("API error");
       const vehicle = await response.json();
-      setMessage(`Готово: автомобиль создан с ID ${vehicle.id}`);
+      setMessage(`Готово: ${vehicle.brand} ${vehicle.model} опубликован.`);
+      setCreatedUrl(`/cars/${vehicle.slug}`);
     } catch {
       setMessage("Не удалось подключиться к API. Запусти backend на localhost:8000.");
     }
@@ -47,18 +45,9 @@ export default function AdminPage() {
 
   return (
     <main>
-      <header>
-        <a href="/">Fenix_Auto</a>
-        <a href="/cars">Перейти в каталог →</a>
-      </header>
-
-      <section>
-        <p>Административная панель</p>
-        <h1>Добавить автомобиль</h1>
-        <p>Первая рабочая форма управления каталогом Fenix_Auto.</p>
-      </section>
-
-      <section>
+      <header className="site-header"><a className="brand" href="/">Fenix_Auto</a><nav><a href="/cars">Каталог</a></nav></header>
+      <section><span className="eyebrow">Админ-панель</span><h1>Добавить автомобиль</h1><p>Создай объявление — оно сохранится в PostgreSQL и появится в каталоге.</p></section>
+      <section className="detail-card">
         <form onSubmit={submit}>
           <label>Марка<input value={form.brand} onChange={(e) => update("brand", e.target.value)} required /></label>
           <label>Модель<input value={form.model} onChange={(e) => update("model", e.target.value)} required /></label>
@@ -71,6 +60,7 @@ export default function AdminPage() {
           <button type="submit">Опубликовать автомобиль</button>
         </form>
         {message && <p>{message}</p>}
+        {createdUrl && <p><a className="primary-button" href={createdUrl}>Открыть карточку автомобиля →</a></p>}
       </section>
     </main>
   );
