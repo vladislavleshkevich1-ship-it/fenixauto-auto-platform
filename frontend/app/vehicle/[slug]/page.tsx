@@ -1,0 +1,18 @@
+import VehicleGallery from "../../../components/VehicleGallery";
+
+const car = {
+  brand: "Deepal", model: "S07", trim: "620 Max", year: 2026, mileage: "0 км", price: "$24 500", status: "В наличии",
+  color: "Серый кузов / рыжий салон", drivetrain: "Полный", body: "Кроссовер", fuel: "Электро", power: "428 л.с.", transmission: "Автоматическая",
+};
+const specs = [["Марка",car.brand],["Модель",car.model],["Комплектация",car.trim],["Год выпуска",car.year],["Пробег",car.mileage],["Кузов",car.body],["Двигатель",car.fuel],["Мощность",car.power],["Коробка",car.transmission],["Привод",car.drivetrain],["Цвет",car.color]];
+export const metadata = { title: `${car.brand} ${car.model} ${car.trim} — Fenix_Auto` };
+export default async function VehiclePage({ params }: { params: Promise<{ slug: string }> }) {
+  await params;
+  return <main className="vehicle-page"><header className="site-header"><a className="brand" href="/">Fenix_Auto</a><nav><a href="/cars">Все автомобили</a><a href="#request">Связаться</a></nav></header>
+    <div className="breadcrumbs"><a href="/cars">Автомобили</a><span>/</span><span>{car.brand} {car.model}</span></div>
+    <section className="vehicle-heading"><div><div className="status-row"><span className="status">● {car.status}</span><span className="source-tag">Fenix_Auto</span></div><h1>{car.brand} {car.model} <span>{car.trim}</span></h1><p className="vehicle-subtitle">{car.year} · {car.mileage} · {car.color}</p></div><div className="price-block"><small>Цена автомобиля</small><strong>{car.price}</strong><a href="#request">Оставить заявку</a></div></section>
+    <section className="vehicle-top"><VehicleGallery/><aside className="vehicle-summary"><div className="summary-title">Кратко об автомобиле</div><div className="summary-grid">{[["Год",car.year],["Пробег",car.mileage],["Мощность",car.power],["Привод",car.drivetrain],["Кузов",car.body],["Топливо",car.fuel]].map(([label,value])=><div key={String(label)}><small>{label}</small><strong>{value}</strong></div>)}</div><div className="summary-note"><span>✓</span><p>Цена указана за автомобиль. Финальные условия покупки уточняются менеджером.</p></div><a className="primary-button" href="#request">Получить предложение</a></aside></section>
+    <section className="detail-layout"><div><section className="detail-card"><div className="section-heading"><span>01</span><h2>Характеристики</h2></div><div className="spec-grid">{specs.map(([label,value])=><div className="spec-row" key={String(label)}><span>{label}</span><strong>{value}</strong></div>)}</div></section><section className="detail-card"><div className="section-heading"><span>02</span><h2>Описание</h2></div><p className="description">Новый Deepal S07 620 Max 2026 года. Серый кузов, рыжий салон. Автомобиль доступен к покупке в Fenix_Auto.</p></section><section className="detail-card"><div className="section-heading"><span>03</span><h2>Комплектация</h2></div><div className="equipment-grid">{["Адаптивный круиз-контроль","Камеры 360°","Панорамная крыша","Бесключевой доступ","Матричные LED-фары","Удержание в полосе","Парктроники","Мультимедийная система"].map(item=><div key={item}>✓ {item}</div>)}</div></section></div>
+      <aside className="request-card" id="request"><span className="eyebrow">Fenix_Auto</span><h2>Хотите этот автомобиль?</h2><p>Оставьте контакты — менеджер уточнит наличие, условия покупки и ответит на вопросы.</p><form><label>Ваше имя<input name="name" placeholder="Имя" required/></label><label>Телефон<input name="phone" placeholder="+375 __ ___ __ __" required/></label><label>Комментарий<textarea name="message" placeholder="Например: хочу посмотреть автомобиль"/></label><button type="submit">Отправить заявку</button></form></aside></section>
+  </main>;
+}
