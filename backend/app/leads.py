@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
+from .db import get_connection
+
 router = APIRouter(prefix="/api/v1/leads", tags=["leads"])
 
 
@@ -13,16 +15,24 @@ class LeadCreate(BaseModel):
     source_page: str | None = None
 
 
-leads: list[dict] = []
-
-
 @router.post("", status_code=201)
 def create_lead(payload: LeadCreate):
-    lead = {"id": len(leads) + 1, **payload.model_dump()}
-    leads.append(lead)
-    return lead
+    with get_connection() as connection:
+        row = connection.execute(
+            """INSERT INTO leads
+               (vehicle_id, name, phone, telegram, message, source_page)
+               VALUES (%s,%s,%s,%s,%s,%s)
+               RETURNING id, vehicle_id, name, phone, telegram, message, source_page, created_at""",
+            (payload.vehicle_id, payload.name, payload.phone, payload.telegram, payload.message, payload.source_page),
+        ).fetchone()
+        connection.commit()
+    return row
 
 
 @router.get("")
 def list_leads():
-    return leads
+    with get_connection() as connection:
+        return connection.execute(
+            """SELECT id, vehicle_id, name, phone, telegram, message, source_page, created_at
+               FROM leads ORDER BY created_at DESC"""
+        ).fetchall()
